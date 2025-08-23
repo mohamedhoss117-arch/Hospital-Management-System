@@ -40,6 +40,7 @@ public:
         name =n;
         age=a;
         contact=c;
+        isAdmitted=false
     }
     
     void admitPatient(RoomType type){
