@@ -88,14 +88,24 @@ private:
     queue<int> appointmentQueue;
     
 public:
-    Doctor(int did, string n, Department d);
+    Doctor(int did, string n, Department d){
+        id=did;
+        name=n;
+        department=d;
+    }
     
     void addAppointment(int patientId);
     int seePatient();
     
-    int getId();
-    string getName();
-    string getDepartment();
+    int getId(){
+        return id;
+    }
+    string getName(){
+        return name;
+    }
+    string getDepartment(){
+        return to_string(department);
+    }
 };
 
 // ========== HOSPITAL CLASS ========== //
@@ -108,7 +118,10 @@ private:
     int doctorCounter;
     
 public:
-    Hospital();
+    Hospital(){
+        patientCounter=0;
+        doctorCounter=0;
+    }
     
     int registerPatient(string name, int age, string contact){
         patientCounter++;
@@ -116,7 +129,12 @@ public:
         patients.push_back(newPatient);
         return patientCounter;
     }
-    int addDoctor(string name, Department dept);
+    int addDoctor(string name, Department dept){
+        doctorCounter++;
+        Doctor newDoc(doctorCounter,name,dept);
+        doctors.push_back(newDoc);
+        return doctorCounter;
+    }
     void admitPatient(int patientId, RoomType type){
         for (auto &p : patients) {
             if (p.getId() == patientId) {
