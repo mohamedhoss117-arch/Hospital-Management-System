@@ -104,9 +104,35 @@ public:
 
     int registerPatient(string name, int age, string contact);
     int addDoctor(string name, Department dept);
-    void admitPatient(int patientId, RoomType type);
-    void addEmergency(int patientId);
-    int handleEmergency();
+    void admitPatient(int patientId, RoomType type)
+    {
+        for (auto &p : patients)
+        {
+            if (p.getId() == patientId)
+            {
+                p.admitPatient(type);
+                return;
+            }
+        }
+        cout << "Patient ID " << patientId << " not found.\n";
+    }
+    void addEmergency(int patientId)
+    {
+        emergencyQueue.push(patientId);
+        cout << "Patient ID " << patientId << " added to emergency queue.\n";
+    }
+    int handleEmergency()
+    {
+        if (emergencyQueue.empty())
+        {
+            cout << "No emergency cases pending.\n";
+            return -1;
+        }
+        int patientId = emergencyQueue.front();
+        emergencyQueue.pop();
+        cout << "Handling emergency for patient ID " << patientId << ".\n";
+        return patientId;
+    }
     void bookAppointment(int doctorId, int patientId);
     void displayPatientInfo(int patientId);
     void displayDoctorInfo(int doctorId);
