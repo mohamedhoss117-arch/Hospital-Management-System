@@ -38,6 +38,49 @@ private:
     RoomType roomType;
 
 public:
+    Patient(int pid, string n, int a, string c){
+        id=pid;
+        name =n;
+        age=a;
+        contact=c;
+        isAdmitted=false
+    }
+    
+    void admitPatient(RoomType type){
+        if(isAdmitted){
+            cout<<"Patient"<<name<<"is already admitted."<<endl;
+            return;
+        }else{
+            isAdmitted=true;
+            roomType=type;
+            cout<<"Patient"<<name<<"admitted successfully!"<<endl;
+            return;
+        }
+    }
+    void dischargePatient(){
+        if(isAdmitted){
+            isAdmitted=false;
+            cout<<"Patient"<<name<<"discharged."<<endl;
+            return;
+        }else{
+            cout<<"Patient"<<name<<"is not admitted."<<endl;
+            return;
+        }
+    }
+    void addMedicalRecord(string record);
+    void requestTest(string testName);
+    string performTest();
+    void displayHistory();
+    
+    int getId(){
+        return id;
+    }
+    string getName(){
+        return name;
+    }
+    bool getAdmissionStatus(){
+        return isAdmitted;
+    }
     Patient(int pid, string n, int a, string c);
 
     void admitPatient(RoomType type);
@@ -79,6 +122,25 @@ private:
     queue<int> appointmentQueue;
 
 public:
+    Doctor(int did, string n, Department d){
+        id=did;
+        name=n;
+        department=d;
+    }
+    
+    void addAppointment(int patientId);
+    int seePatient();
+    
+    int getId(){
+        return id;
+    }
+    string getName(){
+        return name;
+    }
+    string getDepartment(){
+        return to_string(department);
+    }
+
     Doctor(int did, string n, Department d);
 
     void addAppointment(int patientId);
@@ -87,6 +149,7 @@ public:
     int getId();
     string getName();
     string getDepartment();
+
 };
 
 // ========== HOSPITAL CLASS ========== //
@@ -100,6 +163,36 @@ private:
     int doctorCounter;
 
 public:
+
+    Hospital(){
+        patientCounter=0;
+        doctorCounter=0;
+    }
+    
+    int registerPatient(string name, int age, string contact){
+        patientCounter++;
+        Patient newPatient(patientCounter,name,age,contact);
+        patients.push_back(newPatient);
+        return patientCounter;
+    }
+    int addDoctor(string name, Department dept){
+        doctorCounter++;
+        Doctor newDoc(doctorCounter,name,dept);
+        doctors.push_back(newDoc);
+        return doctorCounter;
+    }
+    void admitPatient(int patientId, RoomType type){
+        for (auto &p : patients) {
+            if (p.getId() == patientId) {
+                p.admitPatient(type); 
+                return;
+            }
+        }
+        cout << "Patient with ID " << patientId << " not found!" << endl;
+    }
+    void addEmergency(int patientId);
+    int handleEmergency();
+
     Hospital();
 
     int registerPatient(string name, int age, string contact);
