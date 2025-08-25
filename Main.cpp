@@ -6,7 +6,8 @@
 using namespace std;
 
 // ========== ENUMERATIONS ========== //
-enum Department {
+enum Department
+{
     CARDIOLOGY,
     NEUROLOGY,
     ORTHOPEDICS,
@@ -15,7 +16,8 @@ enum Department {
     GENERAL
 };
 
-enum RoomType {
+enum RoomType
+{
     GENERAL_WARD,
     ICU,
     PRIVATE_ROOM,
@@ -23,7 +25,8 @@ enum RoomType {
 };
 
 // ========== PATIENT CLASS ========== //
-class Patient {
+class Patient
+{
 private:
     int id;
     string name;
@@ -33,7 +36,7 @@ private:
     queue<string> testQueue;
     bool isAdmitted;
     RoomType roomType;
-    
+
 public:
     Patient(int pid, string n, int a, string c){
         id=pid;
@@ -78,16 +81,46 @@ public:
     bool getAdmissionStatus(){
         return isAdmitted;
     }
+    Patient(int pid, string n, int a, string c);
+
+    void admitPatient(RoomType type);
+    void dischargePatient();
+    void addMedicalRecord(string record)
+    {
+        medicalHistory.push(record);
+    }
+    void requestTest(string testName)
+    {
+        testQueue.push(testName);
+        medicalHistory.push("Requested test: " + testName);
+    }
+    string performTest()
+    {
+        if (testQueue.empty())
+        {
+            return "No tests pending";
+        }
+        string testName = testQueue.front();
+        testQueue.pop();
+        medicalHistory.push("Performed test: " + testName);
+        return testName;
+    }
+    void displayHistory();
+
+    int getId();
+    string getName();
+    bool getAdmissionStatus();
 };
 
 // ========== DOCTOR CLASS ========== //
-class Doctor {
+class Doctor
+{
 private:
     int id;
     string name;
     Department department;
     queue<int> appointmentQueue;
-    
+
 public:
     Doctor(int did, string n, Department d){
         id=did;
@@ -107,18 +140,30 @@ public:
     string getDepartment(){
         return to_string(department);
     }
+
+    Doctor(int did, string n, Department d);
+
+    void addAppointment(int patientId);
+    int seePatient();
+
+    int getId();
+    string getName();
+    string getDepartment();
+
 };
 
 // ========== HOSPITAL CLASS ========== //
-class Hospital {
+class Hospital
+{
 private:
     vector<Patient> patients;
     vector<Doctor> doctors;
     queue<int> emergencyQueue;
     int patientCounter;
     int doctorCounter;
-    
+
 public:
+
     Hospital(){
         patientCounter=0;
         doctorCounter=0;
@@ -147,31 +192,66 @@ public:
     }
     void addEmergency(int patientId);
     int handleEmergency();
+
+    Hospital();
+
+    int registerPatient(string name, int age, string contact);
+    int addDoctor(string name, Department dept);
+    void admitPatient(int patientId, RoomType type)
+    {
+        for (auto &p : patients)
+        {
+            if (p.getId() == patientId)
+            {
+                p.admitPatient(type);
+                return;
+            }
+        }
+        cout << "Patient ID " << patientId << " not found.\n";
+    }
+    void addEmergency(int patientId)
+    {
+        emergencyQueue.push(patientId);
+        cout << "Patient ID " << patientId << " added to emergency queue.\n";
+    }
+    int handleEmergency()
+    {
+        if (emergencyQueue.empty())
+        {
+            cout << "No emergency cases pending.\n";
+            return -1;
+        }
+        int patientId = emergencyQueue.front();
+        emergencyQueue.pop();
+        cout << "Handling emergency for patient ID " << patientId << ".\n";
+        return patientId;
+    }
     void bookAppointment(int doctorId, int patientId);
     void displayPatientInfo(int patientId);
     void displayDoctorInfo(int doctorId);
 };
 
 // ========== MAIN PROGRAM ========== //
-int main() {
+int main()
+{
     Hospital hospital;
-    
+
     // Test Case 1: Registering patients
     int p1 = hospital.registerPatient("John Doe", 35, "555-1234");
     int p2 = hospital.registerPatient("Jane Smith", 28, "555-5678");
     int p3 = hospital.registerPatient("Mike Johnson", 45, "555-9012");
-    
+
     // Test Case 2: Adding doctors
     int d1 = hospital.addDoctor("Dr. Smith", CARDIOLOGY);
     int d2 = hospital.addDoctor("Dr. Brown", NEUROLOGY);
     int d3 = hospital.addDoctor("Dr. Lee", PEDIATRICS);
-    
+
     // Test Case 3: Admitting patients
     hospital.admitPatient(p1, PRIVATE_ROOM);
     hospital.admitPatient(p2, ICU);
     // Try admitting already admitted patient
     hospital.admitPatient(p1, SEMI_PRIVATE);
-    
+
     // Test Case 4: Booking appointments
     hospital.bookAppointment(d1, p1);
     hospital.bookAppointment(d1, p2);
@@ -179,39 +259,39 @@ int main() {
     // Try booking with invalid doctor/patient
     hospital.bookAppointment(999, p1); // Invalid doctor
     hospital.bookAppointment(d1, 999); // Invalid patient
-    
+
     // Test Case 5: Handling medical tests
     // These would normally be called on Patient objects
     // In a real implementation, we'd need a way to access patients
-    
+
     // Test Case 6: Emergency cases
     hospital.addEmergency(p3);
     hospital.addEmergency(p1);
     int emergencyPatient = hospital.handleEmergency();
     emergencyPatient = hospital.handleEmergency();
     emergencyPatient = hospital.handleEmergency(); // No more emergencies
-    
+
     // Test Case 7: Discharging patients
     // Would normally call dischargePatient() on Patient objects
-    
+
     // Test Case 8: Displaying information
     hospital.displayPatientInfo(p1);
     hospital.displayPatientInfo(p2);
     hospital.displayPatientInfo(999); // Invalid patient
-    
+
     hospital.displayDoctorInfo(d1);
     hospital.displayDoctorInfo(d2);
     hospital.displayDoctorInfo(999); // Invalid doctor
-    
+
     // Test Case 9: Doctor seeing patients
     // These would normally be called on Doctor objects
     // In a real implementation, we'd need a way to access doctors
-    
+
     // Test Case 10: Edge cases
     Hospital emptyHospital;
     emptyHospital.displayPatientInfo(1); // No patients
     emptyHospital.displayDoctorInfo(1);  // No doctors
     emptyHospital.handleEmergency();     // No emergencies
-    
+
     return 0;
 }
