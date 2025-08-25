@@ -22,7 +22,6 @@ enum RoomType {
     SEMI_PRIVATE
 };
 
-// Helper: enum -> string for Department
 static string departmentToString(Department d) {
     switch (d) {
         case CARDIOLOGY:  return "Cardiology";
@@ -53,7 +52,7 @@ public:
         name = n;
         age = a;
         contact = c;
-        isAdmitted = false;  
+        isAdmitted = false;
     }
 
     void admitPatient(RoomType type) {
@@ -145,7 +144,7 @@ public:
 
     int getId() { return id; }
     string getName() { return name; }
-    string getDepartment() { return departmentToString(department); } 
+    string getDepartment() { return departmentToString(department); }
 };
 
 // ========== HOSPITAL CLASS ========== //
@@ -206,14 +205,28 @@ public:
     void bookAppointment(int doctorId, int patientId) {
         int doctorIndex = -1;
         int patientIndex = -1;
+
         for (int i = 0; i < (int)doctors.size(); i++) {
-            if (doctors[i].getId() == doctorId) { doctorIndex = i; break; }
+            if (doctors[i].getId() == doctorId) {
+                doctorIndex = i;
+                break;
+            }
         }
         for (int i = 0; i < (int)patients.size(); i++) {
-            if (patients[i].getId() == patientId) { patientIndex = i; break; }
+            if (patients[i].getId() == patientId) {
+                patientIndex = i;
+                break;
+            }
         }
-        if (doctorIndex == -1) { cout << "Doctor not found" << endl; return; }
-        if (patientIndex == -1) { cout << "Patient not found" << endl; return; }
+
+        if (doctorIndex == -1) {
+            cout << "Doctor not found" << endl;
+            return;
+        }
+        if (patientIndex == -1) {
+            cout << "Patient not found" << endl;
+            return;
+        }
 
         doctors[doctorIndex].addAppointment(patientId);
         patients[patientIndex].addMedicalRecord("Booked appointment with Dr. " + doctors[doctorIndex].getName());
@@ -226,10 +239,11 @@ public:
                 cout << "Patient ID: " << patients[i].getId() << endl;
                 cout << "Patient Name: " << patients[i].getName() << endl;
                 cout << "Admission Status: " << (patients[i].getAdmissionStatus() ? "Admitted" : "Not Admitted") << endl;
+                patients[i].displayHistory();
                 return;
             }
         }
-        cout << "Patient not found" << endl; 
+        cout << "Patient not found" << endl;
     }
 
     void displayDoctorInfo(int doctorId) {
@@ -241,7 +255,7 @@ public:
                 return;
             }
         }
-        cout << "Doctor not found" << endl; 
+        cout << "Doctor not found" << endl;
     }
 };
 
@@ -271,21 +285,21 @@ int main() {
     hospital.bookAppointment(999, p1); // invalid doctor
     hospital.bookAppointment(d1, 999); // invalid patient
 
-    // Test Case 6: Emergency cases
+    // Test Case 5: Emergency cases
     hospital.addEmergency(p3);
     hospital.addEmergency(p1);
-    int emergencyPatient = hospital.handleEmergency();
-    emergencyPatient = hospital.handleEmergency();
-    emergencyPatient = hospital.handleEmergency(); // No more emergencies
+    hospital.handleEmergency();
+    hospital.handleEmergency();
+    hospital.handleEmergency(); // no emergencies
 
-    // Test Case 8: Displaying information
+    // Test Case 6: Displaying information
     hospital.displayPatientInfo(p1);
     hospital.displayPatientInfo(p2);
-    hospital.displayPatientInfo(999); // Invalid patient
+    hospital.displayPatientInfo(999); // invalid patient
 
     hospital.displayDoctorInfo(d1);
     hospital.displayDoctorInfo(d2);
-    hospital.displayDoctorInfo(999); // Invalid doctor
+    hospital.displayDoctorInfo(999); // invalid doctor
 
     return 0;
 }
