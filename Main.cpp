@@ -136,13 +136,6 @@ public:
         return pId;
     }
 
-
-        id=did;
-        name=n;
-        department=d;
-    }
-    
-    
     int getId(){
         return id;
     }
