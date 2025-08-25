@@ -6,7 +6,8 @@
 using namespace std;
 
 // ========== ENUMERATIONS ========== //
-enum Department {
+enum Department
+{
     CARDIOLOGY,
     NEUROLOGY,
     ORTHOPEDICS,
@@ -15,7 +16,8 @@ enum Department {
     GENERAL
 };
 
-enum RoomType {
+enum RoomType
+{
     GENERAL_WARD,
     ICU,
     PRIVATE_ROOM,
@@ -23,7 +25,8 @@ enum RoomType {
 };
 
 // ========== PATIENT CLASS ========== //
-class Patient {
+class Patient
+{
 private:
     int id;
     string name;
@@ -35,22 +38,77 @@ private:
     RoomType roomType;
 
 public:
+
+    Patient(int pid, string n, int a, string c){
+        id=pid;
+        name =n;
+        age=a;
+        contact=c;
+        isAdmitted=false
+    }
+    
+    void admitPatient(RoomType type){
+        if(isAdmitted){
+            cout<<"Patient"<<name<<"is already admitted."<<endl;
+            return;
+        }else{
+            isAdmitted=true;
+            roomType=type;
+            cout<<"Patient"<<name<<"admitted successfully!"<<endl;
+            return;
+        }
+    }
+    void dischargePatient(){
+        if(isAdmitted){
+            isAdmitted=false;
+            cout<<"Patient"<<name<<"discharged."<<endl;
+            return;
+        }else{
+            cout<<"Patient"<<name<<"is not admitted."<<endl;
+            return;
+        }
+    }
+    
+    int getId(){
+        return id;
+    }
+    string getName(){
+        return name;
+    }
+    bool getAdmissionStatus(){
+        return isAdmitted;
+    }
     Patient(int pid, string n, int a, string c);
 
     void admitPatient(RoomType type);
     void dischargePatient();
-    void addMedicalRecord(string record);
-    void requestTest(string testName);
-    string performTest();
+    void addMedicalRecord(string record)
+    {
+        medicalHistory.push(record);
+    }
+    void requestTest(string testName)
+    {
+        testQueue.push(testName);
+        medicalHistory.push("Requested test: " + testName);
+    }
+    string performTest()
+    {
+        if (testQueue.empty())
+        {
+            return "No tests pending";
+        }
+        string testName = testQueue.front();
+        testQueue.pop();
+        medicalHistory.push("Performed test: " + testName);
+        return testName;
+    }
     void displayHistory();
 
-    int getId();
-    string getName();
-    bool getAdmissionStatus();
 };
 
 // ========== DOCTOR CLASS ========== //
-class Doctor {
+class Doctor
+{
 private:
     int id;
     string name;
@@ -78,13 +136,30 @@ public:
         return pId;
     }
 
-    int getId();
-    string getName();
-    string getDepartment();
+
+        id=did;
+        name=n;
+        department=d;
+    }
+    
+    
+    int getId(){
+        return id;
+    }
+    string getName(){
+        return name;
+    }
+    string getDepartment(){
+        return to_string(department);
+    }
+
+
+
 };
 
 // ========== HOSPITAL CLASS ========== //
-class Hospital {
+class Hospital
+{
 private:
     vector<Patient> patients;
     vector<Doctor> doctors;
@@ -93,14 +168,53 @@ private:
     int doctorCounter;
 
 public:
-    Hospital();
 
-    int registerPatient(string name, int age, string contact);
-    int addDoctor(string name, Department dept);
-    void admitPatient(int patientId, RoomType type);
-    void addEmergency(int patientId);
-    int handleEmergency();
-    void bookAppointment(int doctorId, int patientId){
+
+    Hospital(){
+        patientCounter=0;
+        doctorCounter=0;
+    }
+    
+    int registerPatient(string name, int age, string contact){
+        patientCounter++;
+        Patient newPatient(patientCounter,name,age,contact);
+        patients.push_back(newPatient);
+        return patientCounter;
+    }
+    int addDoctor(string name, Department dept){
+        doctorCounter++;
+        Doctor newDoc(doctorCounter,name,dept);
+        doctors.push_back(newDoc);
+        return doctorCounter;
+    }
+    void admitPatient(int patientId, RoomType type){
+        for (auto &p : patients) {
+            if (p.getId() == patientId) {
+                p.admitPatient(type); 
+                return;
+            }
+        }
+        cout << "Patient with ID " << patientId << " not found!" << endl;
+    }
+  
+    void addEmergency(int patientId)
+    {
+        emergencyQueue.push(patientId);
+        cout << "Patient ID " << patientId << " added to emergency queue.\n";
+    }
+    int handleEmergency()
+    {
+        if (emergencyQueue.empty())
+        {
+            cout << "No emergency cases pending.\n";
+            return -1;
+        }
+        int patientId = emergencyQueue.front();
+        emergencyQueue.pop();
+        cout << "Handling emergency for patient ID " << patientId << ".\n";
+        return patientId;
+    }
+     void bookAppointment(int doctorId, int patientId){
             int doctorIndex = -1;
             int patientIndex = -1;
             for (int i=0; i<doctors.size(); i++){
@@ -151,10 +265,12 @@ public:
             }
         }
     }
+  
 };
 
 // ========== MAIN PROGRAM ========== //
-int main() {
+int main()
+{
     Hospital hospital;
 
     // Test Case 1: Registering patients
